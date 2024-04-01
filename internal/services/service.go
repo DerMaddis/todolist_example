@@ -16,12 +16,20 @@ func New(db database.Database) *Service {
 	}
 }
 
-func (s *Service) GetTodos() []models.Todo {
-	return s.db.GetTodos()
+func (s *Service) GetTodos() ([]models.Todo, error) {
+	todos, err := s.db.GetTodos()
+	if err != nil {
+		return []models.Todo{}, fmt.Errorf("GetTodos: %w", err)
+	}
+	return todos, nil
 }
 
 func (s *Service) GetTodoById(id int) (models.Todo, error) {
-    return s.db.GetTodoById(id)
+	todo, err := s.db.GetTodoById(id)
+	if err != nil {
+		return models.Todo{}, fmt.Errorf("GetTodoById: %w", err)
+	}
+	return todo, nil
 }
 
 func (s *Service) AddTodo(title string) error {

@@ -2,15 +2,19 @@ package transport
 
 import (
 	"errors"
-	"net/http"
 	"github.com/dermaddis/todolist_example/internal/errs"
 	"github.com/dermaddis/todolist_example/internal/templates"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
 func (h *Handler) getIndex(c echo.Context) error {
-	return Render(c, http.StatusOK, templates.Index(h.service.GetTodos()))
+	todos, err := h.service.GetTodos()
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "internal server error")
+	}
+	return Render(c, http.StatusOK, templates.Index(todos))
 }
 
 type PostTodo struct {
@@ -23,9 +27,17 @@ func (h *Handler) postTodo(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "bad request")
 	}
 
-	h.service.AddTodo(data.Title)
+	err := h.service.AddTodo(data.Title)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "internal server error")
+	}
 
-	return Render(c, http.StatusOK, templates.TodoList(h.service.GetTodos()))
+	todos, err := h.service.GetTodos()
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "internal server error")
+	}
+
+	return Render(c, http.StatusOK, templates.TodoList(todos))
 }
 
 type PostTodoId struct {

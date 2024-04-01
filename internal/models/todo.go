@@ -3,10 +3,9 @@ package models
 import "fmt"
 
 type Todo struct {
-	Title           string
-	Completed       bool
-	CompletedString string
-	Id              int
+	Title     string `db:"title"`
+	Completed bool   `db:"completed"`
+	Id        int    `db:"id"`
 }
 
 func (t Todo) String() string {

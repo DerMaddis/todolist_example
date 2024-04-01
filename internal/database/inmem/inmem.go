@@ -20,20 +20,28 @@ func New() InmemDatabase {
 	}
 }
 
-func (d *InmemDatabase) GetTodos() []models.Todo {
-	return d.Todos
+func (d *InmemDatabase) GetTodos() ([]models.Todo, error) {
+	return d.Todos, nil
 }
 
-func (d *InmemDatabase) NumTodos() int {
-	return len(d.Todos)
+func (d *InmemDatabase) NumTodos() (int, error) {
+	return len(d.Todos), nil
 }
 
-func (d *InmemDatabase) TodoExists(id int) bool {
-	return id >= 0 && id < d.NumTodos()
+func (d *InmemDatabase) TodoExists(id int) (bool, error) {
+	numTodos, err := d.NumTodos()
+	if err != nil {
+		return false, fmt.Errorf("TodoExists: %w", err)
+	}
+	return id >= 0 && id < numTodos, nil
 }
 
 func (d *InmemDatabase) GetTodoById(id int) (models.Todo, error) {
-	if !d.TodoExists(id) {
+	exists, err := d.TodoExists(id)
+	if err != nil {
+		return models.Todo{}, fmt.Errorf("GetTodoById: %w", err)
+	}
+	if !exists {
 		return models.Todo{}, fmt.Errorf("GetTodoById: %w", errs.ErrorNotFound)
 	}
 	return d.Todos[id], nil
@@ -41,11 +49,15 @@ func (d *InmemDatabase) GetTodoById(id int) (models.Todo, error) {
 
 func (d *InmemDatabase) AddTodo(title string) error {
 	d.Todos = append(d.Todos, models.Todo{Id: len(d.Todos), Title: title, Completed: false})
-    return nil
+	return nil
 }
 
 func (d *InmemDatabase) UpdateTodo(id int, title string, completed bool) error {
-	if !d.TodoExists(id) {
+	exists, err := d.TodoExists(id)
+	if err != nil {
+		return fmt.Errorf("GetTodoById: %w", err)
+	}
+	if !exists {
 		return fmt.Errorf("UpdateTodo: %w", errs.ErrorNotFound)
 	}
 

@@ -1,7 +1,0 @@
-CREATE USER todo;
-ALTER USER todo WITH PASSWORD 'todo';
-
-CREATE DATABASE todolist;
-
-GRANT ALL PRIVILEGES ON DATABASE todolist TO todo;
-

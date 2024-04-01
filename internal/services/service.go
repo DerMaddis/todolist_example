@@ -2,7 +2,9 @@ package services
 
 import (
 	"fmt"
+
 	"github.com/dermaddis/todolist_example/internal/database"
+	"github.com/dermaddis/todolist_example/internal/errs"
 	"github.com/dermaddis/todolist_example/internal/models"
 )
 
@@ -41,7 +43,15 @@ func (s *Service) AddTodo(title string) error {
 }
 
 func (s *Service) UpdateTodo(id int, title string, completed bool) error {
-	err := s.db.UpdateTodo(id, title, completed)
+    exists, err := s.db.TodoExists(id)
+    if err != nil {
+        return fmt.Errorf("UpdateTodo: %w", err)
+    }
+    if !exists {
+        return errs.ErrorNotFound
+    }
+
+	err = s.db.UpdateTodo(id, title, completed)
 	if err != nil {
 		return fmt.Errorf("UpdateTodo: %w", err)
 	}

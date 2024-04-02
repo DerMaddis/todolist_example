@@ -2,9 +2,10 @@ package transport
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/dermaddis/todolist_example/internal/errs"
 	"github.com/dermaddis/todolist_example/internal/templates"
-	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
@@ -41,9 +42,9 @@ func (h *Handler) postTodo(c echo.Context) error {
 }
 
 type PostTodoId struct {
-	Id              int    `form:"id"`
-	Title           string `form:"title"`
-	CompletedString string `form:"completed_string"`
+    Id              int    `form:"id" validate:"required"`
+    Title           string `form:"title" validate:"required"`
+    CompletedString string `form:"completed_string" validate:"required"`
 }
 
 func (h *Handler) postTodoId(c echo.Context) error {
@@ -51,8 +52,11 @@ func (h *Handler) postTodoId(c echo.Context) error {
 	if err := c.Bind(&data); err != nil {
 		return c.String(http.StatusBadRequest, "bad request")
 	}
+    if err := c.Validate(data); err != nil {
+        return c.String(http.StatusBadRequest, "bad request")
+    }
 
-	err := h.service.UpdateTodo(data.Id, data.Title, data.CompletedString == "on")
+    err := h.service.UpdateTodo(data.Id, data.Title, data.CompletedString == "on")
 	if err != nil {
 		if errors.Is(err, errs.ErrorNotFound) {
 			return c.String(http.StatusNotFound, "not found")

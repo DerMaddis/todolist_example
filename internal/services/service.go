@@ -1,10 +1,7 @@
 package services
 
 import (
-	"fmt"
-
 	"github.com/dermaddis/todolist_example/internal/database"
-	"github.com/dermaddis/todolist_example/internal/errs"
 	"github.com/dermaddis/todolist_example/internal/models"
 )
 
@@ -21,7 +18,7 @@ func New(db database.Database) *Service {
 func (s *Service) GetTodos() ([]models.Todo, error) {
 	todos, err := s.db.GetTodos()
 	if err != nil {
-		return []models.Todo{}, fmt.Errorf("GetTodos: %w", err)
+		return []models.Todo{}, err
 	}
 	return todos, nil
 }
@@ -29,7 +26,7 @@ func (s *Service) GetTodos() ([]models.Todo, error) {
 func (s *Service) GetTodoById(id int) (models.Todo, error) {
 	todo, err := s.db.GetTodoById(id)
 	if err != nil {
-		return models.Todo{}, fmt.Errorf("GetTodoById: %w", err)
+		return models.Todo{}, err
 	}
 	return todo, nil
 }
@@ -37,23 +34,15 @@ func (s *Service) GetTodoById(id int) (models.Todo, error) {
 func (s *Service) AddTodo(title string) error {
 	err := s.db.AddTodo(title)
 	if err != nil {
-		return fmt.Errorf("AddTodo: %w", err)
+		return err
 	}
 	return nil
 }
 
 func (s *Service) UpdateTodo(id int, title string, completed bool) error {
-    exists, err := s.db.TodoExists(id)
-    if err != nil {
-        return fmt.Errorf("UpdateTodo: %w", err)
-    }
-    if !exists {
-        return errs.ErrorNotFound
-    }
-
-	err = s.db.UpdateTodo(id, title, completed)
+	err := s.db.UpdateTodo(id, title, completed)
 	if err != nil {
-		return fmt.Errorf("UpdateTodo: %w", err)
+		return err
 	}
 	return nil
 }

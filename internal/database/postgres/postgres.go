@@ -82,3 +82,18 @@ func (p *PostgresDatabase) UpdateTodo(id int, title string, completed bool) erro
 	}
 	return nil
 }
+
+func (p *PostgresDatabase) DeleteTodo(id int) error {
+	res, err := p.db.Exec("DELETE FROM todos WHERE id = $1", id)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return errs.ErrorNotFound
+	}
+	return nil
+}

@@ -6,25 +6,31 @@ import (
 )
 
 type InmemDatabase struct {
-	todos []models.Todo
+	todos  map[int]models.Todo
+	nextId int
 }
 
 func New() InmemDatabase {
 	return InmemDatabase{
-		todos: []models.Todo{
-			{Id: 0, Title: "Todo 1", Completed: false},
-			{Id: 1, Title: "Todo 2", Completed: true},
-			{Id: 2, Title: "Todo 3", Completed: false},
+		todos: map[int]models.Todo{
+			0: {Id: 0, Title: "Todo 1", Completed: false},
+			1: {Id: 1, Title: "Todo 2", Completed: true},
+			2: {Id: 2, Title: "Todo 3", Completed: false},
 		},
+		nextId: 3,
 	}
 }
 
 func (d *InmemDatabase) todoExists(id int) bool {
-	return 0 <= id && id < len(d.todos)
+	return 0 <= id && id < d.nextId
 }
 
 func (d *InmemDatabase) GetTodos() ([]models.Todo, error) {
-	return d.todos, nil
+	todos := make([]models.Todo, 0, len(d.todos))
+	for _, v := range d.todos {
+		todos = append(todos, v)
+	}
+	return todos, nil
 }
 
 func (d *InmemDatabase) NumTodos() (int, error) {
@@ -36,7 +42,8 @@ func (d *InmemDatabase) GetTodoById(id int) (models.Todo, error) {
 }
 
 func (d *InmemDatabase) AddTodo(title string) error {
-	d.todos = append(d.todos, models.Todo{Id: len(d.todos), Title: title, Completed: false})
+	d.todos[d.nextId] = models.Todo{Id: d.nextId, Title: title, Completed: false}
+	d.nextId++
 	return nil
 }
 
@@ -48,5 +55,15 @@ func (d *InmemDatabase) UpdateTodo(id int, title string, completed bool) error {
 
 	updated := models.Todo{Id: id, Title: title, Completed: completed}
 	d.todos[updated.Id] = updated
+	return nil
+}
+
+func (d *InmemDatabase) DeleteTodo(id int) error {
+	exists := d.todoExists(id)
+	if !exists {
+		return errs.ErrorNotFound
+	}
+
+	delete(d.todos, id)
 	return nil
 }

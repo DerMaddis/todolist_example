@@ -2,6 +2,7 @@ package transport
 
 import (
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/dermaddis/todolist_example/internal/errs"
@@ -19,7 +20,7 @@ func (h *Handler) getIndex(c echo.Context) error {
 }
 
 type PostTodo struct {
-    Title string `form:"title" validate:"required"`
+	Title string `form:"title" validate:"required"`
 }
 
 func (h *Handler) postTodo(c echo.Context) error {
@@ -27,9 +28,9 @@ func (h *Handler) postTodo(c echo.Context) error {
 	if err := c.Bind(&data); err != nil {
 		return c.String(http.StatusBadRequest, "bad request")
 	}
-    if err := c.Validate(data); err != nil {
-        return c.String(http.StatusBadRequest, "bad request")
-    }
+	if err := c.Validate(data); err != nil {
+		return c.String(http.StatusBadRequest, "bad request")
+	}
 
 	err := h.service.AddTodo(data.Title)
 	if err != nil {
@@ -45,9 +46,9 @@ func (h *Handler) postTodo(c echo.Context) error {
 }
 
 type PostTodoId struct {
-    Id              int    `form:"id" validate:"required"`
-    Title           string `form:"title" validate:"required"`
-    CompletedString string `form:"completed_string" validate:"required"`
+	Id              *int    `param:"id" validate:"required"`
+	Title           string  `form:"title" validate:"required"`
+	CompletedString *string `form:"completed_string"`
 }
 
 func (h *Handler) postTodoId(c echo.Context) error {
@@ -55,11 +56,11 @@ func (h *Handler) postTodoId(c echo.Context) error {
 	if err := c.Bind(&data); err != nil {
 		return c.String(http.StatusBadRequest, "bad request")
 	}
-    if err := c.Validate(data); err != nil {
-        return c.String(http.StatusBadRequest, "bad request")
-    }
+	if err := c.Validate(data); err != nil {
+		return c.String(http.StatusBadRequest, "bad request")
+	}
 
-    err := h.service.UpdateTodo(data.Id, data.Title, data.CompletedString == "on")
+	err := h.service.UpdateTodo(*data.Id, data.Title, data.CompletedString != nil)
 	if err != nil {
 		if errors.Is(err, errs.ErrorNotFound) {
 			return c.String(http.StatusNotFound, "not found")
@@ -67,7 +68,7 @@ func (h *Handler) postTodoId(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "internal server error")
 	}
 
-	todo, err := h.service.GetTodoById(data.Id)
+	todo, err := h.service.GetTodoById(*data.Id)
 	if err != nil {
 		if errors.Is(err, errs.ErrorNotFound) {
 			return c.String(http.StatusNotFound, "not found")
@@ -76,4 +77,29 @@ func (h *Handler) postTodoId(c echo.Context) error {
 	}
 
 	return Render(c, http.StatusOK, templates.Todo(todo))
+}
+
+type DeleteTodoId struct {
+	Id *int `param:"id" validate:"required"`
+}
+
+func (h *Handler) deleteTodoId(c echo.Context) error {
+	var data DeleteTodoId
+	if err := c.Bind(&data); err != nil {
+		return c.String(http.StatusBadRequest, "bad request")
+	}
+	if err := c.Validate(data); err != nil {
+		return c.String(http.StatusBadRequest, "bad request")
+	}
+
+	err := h.service.DeleteTodo(*data.Id)
+	if err != nil {
+		log.Println(err)
+		if errors.Is(err, errs.ErrorNotFound) {
+			return c.String(http.StatusNotFound, "not found")
+		}
+		return c.String(http.StatusInternalServerError, "internal server error")
+	}
+
+	return c.String(http.StatusOK, "") // Replaces the todo that was deleted
 }

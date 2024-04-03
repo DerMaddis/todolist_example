@@ -46,3 +46,11 @@ func (s *Service) UpdateTodo(id int, title string, completed bool) error {
 	}
 	return nil
 }
+
+func (s *Service) DeleteTodo(id int) error {
+    err := s.db.DeleteTodo(id)
+    if err != nil {
+        return err
+    }
+    return nil
+}

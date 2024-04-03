@@ -8,5 +8,6 @@ type Database interface {
 	NumTodos() (int, error)
 	AddTodo(title string) error
 	UpdateTodo(id int, title string, completed bool) error
+	DeleteTodo(id int) error
 	// todo: Delete
 }

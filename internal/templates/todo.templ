@@ -15,10 +15,12 @@ templ Todo(todo models.Todo) {
 			hx-vals={ fmt.Sprintf(`{"id": %d}`, todo.Id) }
 			hx-indicator={ fmt.Sprintf(".spinner-%d", todo.Id) }
 		>
+        <input class="px-[1rem] bg-lgray-200 dark:bg-dgray-200 hover:bg-lgray-300 hover:dark:bg-dgray-300 text-black dark:text-white rounded-sm shadow-md" type="button" value="Delete" hx-delete={ fmt.Sprintf("/todo/%d", todo.Id) } hx-target={ fmt.Sprintf("li.todo-%d", todo.Id) } hx-swap="outerHTML" hx-vals={ fmt.Sprintf(`{"id": %d}`, todo.Id) }/>
 			<input
 				id={ fmt.Sprintf("completed-%d", todo.Id) }
 				type="checkbox"
 				checked?={ todo.Completed }
+                value="on"
 				name="completed_string"
 			/>
 			<input

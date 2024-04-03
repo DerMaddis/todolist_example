@@ -20,4 +20,5 @@ func (h *Handler) RegisterRoutes(e *echo.Echo) {
 	e.GET("/", h.getIndex)
 	e.POST("/todo", h.postTodo)
 	e.POST("/todo/:id", h.postTodoId)
+    e.DELETE("/todo/:id", h.deleteTodoId)
 }

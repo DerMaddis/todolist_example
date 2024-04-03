@@ -32,6 +32,7 @@ func Run() {
 
 	e := echo.New()
 	e.Validator = &CustomValidator{validator: validator.New()}
+    e.Static("/assets", "./internal/templates/assets")
 
 	dbMode := config.LoadEnvVar("db_mode")
 	var database database.Database

@@ -19,7 +19,7 @@ func (h *Handler) getIndex(c echo.Context) error {
 }
 
 type PostTodo struct {
-	Title string `form:"title"`
+    Title string `form:"title" validate:"required"`
 }
 
 func (h *Handler) postTodo(c echo.Context) error {
@@ -27,6 +27,9 @@ func (h *Handler) postTodo(c echo.Context) error {
 	if err := c.Bind(&data); err != nil {
 		return c.String(http.StatusBadRequest, "bad request")
 	}
+    if err := c.Validate(data); err != nil {
+        return c.String(http.StatusBadRequest, "bad request")
+    }
 
 	err := h.service.AddTodo(data.Title)
 	if err != nil {

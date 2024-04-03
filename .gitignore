@@ -1,1 +1,3 @@
 .env
+/internal/templates/assets/styles.css
+/internal/templates/*.go

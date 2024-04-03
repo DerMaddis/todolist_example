@@ -6,7 +6,7 @@ import (
 )
 
 templ Todo(todo models.Todo) {
-	<li class={ fmt.Sprintf("todo-%d", todo.Id) }>
+	<li class={ "w-[30rem] flex flex-row justify-around items-center" , fmt.Sprintf("todo-%d", todo.Id) }>
 		<form
 			hx-post={ fmt.Sprintf("/todo/%d", todo.Id) }
 			hx-target={ fmt.Sprintf("li.todo-%d", todo.Id) }
@@ -21,7 +21,13 @@ templ Todo(todo models.Todo) {
 				checked?={ todo.Completed }
 				name="completed_string"
 			/>
-			<input id={ fmt.Sprintf("title-%d", todo.Id) } type="text" value={ todo.Title } name="title"/>
+			<input
+				class="bg-lgray-100 dark:bg-dgray-100 text-black dark:text-white rounded-sm shadow-md"
+				id={ fmt.Sprintf("title-%d", todo.Id) }
+				type="text"
+				value={ todo.Title }
+				name="title"
+			/>
 		</form>
 		@spinner(todo.Id)
 	</li>

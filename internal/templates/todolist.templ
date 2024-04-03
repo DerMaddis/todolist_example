@@ -10,9 +10,8 @@ templ TodoList(todos []models.Todo) {
 			}
 		</ul>
 		<form hx-post="/todo" hx-target="section.todo-list">
-			<input id="add-title" type="text" name="title" placeholder="Title"/>
-			<button id="add-button" type="submit">Add</button>
+			<input class="bg-lgray-100 dark:bg-dgray-100 text-black dark:text-white rounded-sm shadow-md" id="add-title" type="text" name="title" placeholder="Title"/>
+			<button class="px-[1rem] bg-lgray-200 dark:bg-dgray-200 text-black dark:text-white hover:bg-lgray-300 hover:dark:bg-dgray-300 rounded-sm transition-all" id="add-button" type="submit">Add</button>
 		</form>
 	</section>
 }
-

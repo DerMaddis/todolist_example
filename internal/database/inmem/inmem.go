@@ -1,6 +1,9 @@
 package inmem
 
 import (
+	"slices"
+	"time"
+
 	"github.com/dermaddis/todolist_example/internal/errs"
 	"github.com/dermaddis/todolist_example/internal/models"
 )
@@ -11,11 +14,12 @@ type InmemDatabase struct {
 }
 
 func New() InmemDatabase {
+	now := time.Now()
 	return InmemDatabase{
 		todos: map[int]models.Todo{
-			0: {Id: 0, Title: "Todo 1", Completed: false},
-			1: {Id: 1, Title: "Todo 2", Completed: true},
-			2: {Id: 2, Title: "Todo 3", Completed: false},
+			0: {Id: 0, Title: "Todo 1", Completed: false, Created: now},
+			1: {Id: 1, Title: "Todo 2", Completed: true, Created: now},
+			2: {Id: 2, Title: "Todo 3", Completed: false, Created: now},
 		},
 		nextId: 3,
 	}
@@ -30,6 +34,11 @@ func (d *InmemDatabase) GetTodos() ([]models.Todo, error) {
 	for _, v := range d.todos {
 		todos = append(todos, v)
 	}
+
+	slices.SortFunc(todos, func(i, j models.Todo) int {
+		return i.Created.Compare(j.Created)
+	})
+
 	return todos, nil
 }
 
@@ -42,7 +51,7 @@ func (d *InmemDatabase) GetTodoById(id int) (models.Todo, error) {
 }
 
 func (d *InmemDatabase) AddTodo(title string) error {
-	d.todos[d.nextId] = models.Todo{Id: d.nextId, Title: title, Completed: false}
+	d.todos[d.nextId] = models.Todo{Id: d.nextId, Title: title, Completed: false, Created: time.Now()}
 	d.nextId++
 	return nil
 }

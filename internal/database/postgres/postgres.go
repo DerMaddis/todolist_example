@@ -3,6 +3,7 @@ package postgres
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/dermaddis/todolist_example/internal/config"
 	"github.com/dermaddis/todolist_example/internal/errs"
@@ -35,7 +36,7 @@ func New() PostgresDatabase {
 
 func (p *PostgresDatabase) GetTodos() ([]models.Todo, error) {
 	todos := []models.Todo{}
-	err := p.db.Select(&todos, "SELECT * FROM todos ORDER BY id")
+	err := p.db.Select(&todos, "SELECT * FROM todos ORDER BY created ASC")
 	if err != nil {
 		return []models.Todo{}, err
 	}
@@ -61,7 +62,7 @@ func (p *PostgresDatabase) GetTodoById(id int) (models.Todo, error) {
 }
 
 func (p *PostgresDatabase) AddTodo(title string) error {
-	_, err := p.db.Exec("INSERT INTO todos (title, completed) VALUES ($1, $2)", title, false)
+	_, err := p.db.Exec("INSERT INTO todos (title, completed, created) VALUES ($1, $2, $3)", title, false, time.Now())
 	if err != nil {
 		return err
 	}

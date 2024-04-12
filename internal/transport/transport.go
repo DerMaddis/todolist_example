@@ -6,19 +6,20 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type Handler struct{
-    service *services.Service
+type Handler struct {
+	service *services.Service
 }
 
 func New(service *services.Service) Handler {
 	return Handler{
-        service: service,
-    }
+		service: service,
+	}
 }
 
 func (h *Handler) RegisterRoutes(e *echo.Echo) {
 	e.GET("/", h.getIndex)
+	e.GET("/:id", h.getTodoById)
 	e.POST("/todo", h.postTodo)
 	e.POST("/todo/:id", h.postTodoId)
-    e.DELETE("/todo/:id", h.deleteTodoId)
+	e.DELETE("/todo/:id", h.deleteTodoId)
 }

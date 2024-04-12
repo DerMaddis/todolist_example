@@ -1,6 +1,8 @@
 package postgres
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -56,6 +58,9 @@ func (p *PostgresDatabase) GetTodoById(id int) (models.Todo, error) {
 	var todo models.Todo
 	err := p.db.Get(&todo, "SELECT * FROM todos WHERE id = $1", id)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.Todo{}, errs.ErrorNotFound
+		}
 		return models.Todo{}, err
 	}
 	return todo, nil

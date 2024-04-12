@@ -19,6 +19,29 @@ func (h *Handler) getIndex(c echo.Context) error {
 	return Render(c, http.StatusOK, templates.Index(todos))
 }
 
+type GetTodoById struct {
+	Id *int `param:"id" validate:"required"`
+}
+
+func (h *Handler) getTodoById(c echo.Context) error {
+	var data GetTodoById
+	if err := c.Bind(&data); err != nil {
+		return c.String(http.StatusBadRequest, "bad request")
+	}
+	if err := c.Validate(data); err != nil {
+		return c.String(http.StatusBadRequest, "bad request")
+	}
+
+	todo, err := h.service.GetTodoById(*data.Id)
+	if err != nil {
+		if errors.Is(err, errs.ErrorNotFound) {
+			return c.String(http.StatusNotFound, "not found")
+		}
+		return c.String(http.StatusInternalServerError, "internal server error")
+	}
+	return Render(c, http.StatusOK, templates.Todo(todo))
+}
+
 type PostTodo struct {
 	Title string `form:"title" validate:"required"`
 }

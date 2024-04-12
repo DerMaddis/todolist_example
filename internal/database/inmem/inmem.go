@@ -47,10 +47,11 @@ func (d *InmemDatabase) NumTodos() (int, error) {
 }
 
 func (d *InmemDatabase) GetTodoById(id int) (models.Todo, error) {
-	if !d.todoExists(id) {
+	todo, ok := d.todos[id]
+	if !ok {
 		return models.Todo{}, errs.ErrorNotFound
 	}
-	return d.todos[id], nil
+	return todo, nil
 }
 
 func (d *InmemDatabase) AddTodo(title string) error {
